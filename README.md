@@ -120,4 +120,4 @@ swift run BridgeMark
 
 ---
 
-Built with ☕ by [SAWKIT](https://github.com/TheSawkit)
+Built with ❤️ by [SAWKIT](https://github.com/TheSawkit)
