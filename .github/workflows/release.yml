@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          set -e
+          brew update
+          brew install --quiet create-dmg || true
+
+      - name: Build (release)
+        run: swift build -c release
+
+      - name: Create DMG (unsigned)
+        env:
+          CODESIGN_IDENTITY: '-'
+          NOTARIZE: '0'
+          UNIVERSAL: '0'
+        run: ./build-dmg.sh
+
+      - name: Upload DMG to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bridge-dmg
+          path: dist/*.dmg
