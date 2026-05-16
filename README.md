@@ -3,6 +3,7 @@
 [![Swift](https://img.shields.io/badge/Swift-6.0-F05138?style=flat&logo=swift&logoColor=white)](https://swift.org/)
 [![macOS](https://img.shields.io/badge/macOS-13%2B-000000?style=flat&logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![SPM](https://img.shields.io/badge/SPM-compatible-F05138?style=flat)](https://swift.org/package-manager/)
+[![Download](https://img.shields.io/badge/download-latest-blue?style=flat)](https://github.com/TheSawkit/BridgeMark/releases/latest)
 
 > **Your Safari bookmarks, everywhere.**
 > Export your entire bookmark bar to any Chromium browser in one click — Safari is never touched.
