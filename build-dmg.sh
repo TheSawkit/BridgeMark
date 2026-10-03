@@ -99,7 +99,7 @@ echo "✍️   Signature (identity: ${CODESIGN_IDENTITY})..."
 find "$APP_BUNDLE" -exec xattr -c {} \; 2>/dev/null || true
 
 if [[ "$CODESIGN_IDENTITY" == "-" ]]; then
-  codesign --force --deep --sign - "$APP_BUNDLE"
+  codesign --force --sign - "$APP_BUNDLE"
 else
   codesign \
     --force \
@@ -108,25 +108,6 @@ else
     --sign "$CODESIGN_IDENTITY" \
     --timestamp \
     "$APP_BUNDLE"
-fi
-
-# ── Notarization ──────────────────────────────────────────────────────────────
-if [[ "$NOTARIZE" == "1" ]]; then
-  [[ "$CODESIGN_IDENTITY" != "-" ]] \
-    || { echo "❌  CODESIGN_IDENTITY requis pour notariser"; exit 1; }
-  [[ -n "${APPLE_ID:-}" && -n "${APPLE_TEAM_ID:-}" && -n "${APPLE_APP_PASSWORD:-}" ]] \
-    || { echo "❌  APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD requis"; exit 1; }
-
-  echo "📬  Notarisation de l'app..."
-  APP_ZIP="$DIST/$APP_NAME-$VERSION-notarize.zip"
-  ditto -c -k --keepParent "$APP_BUNDLE" "$APP_ZIP"
-  xcrun notarytool submit "$APP_ZIP" \
-    --apple-id  "$APPLE_ID" \
-    --team-id   "$APPLE_TEAM_ID" \
-    --password  "$APPLE_APP_PASSWORD" \
-    --wait
-  rm -f "$APP_ZIP"
-  xcrun stapler staple "$APP_BUNDLE"
 fi
 
 # ── DMG ───────────────────────────────────────────────────────────────────────
@@ -149,6 +130,22 @@ create-dmg \
 
 if [[ "$CODESIGN_IDENTITY" != "-" ]]; then
   codesign --sign "$CODESIGN_IDENTITY" --timestamp "$DMG"
+fi
+
+# ── Notarization (outermost container only) ──────────────────────────────────
+if [[ "$NOTARIZE" == "1" ]]; then
+  [[ "$CODESIGN_IDENTITY" != "-" ]] \
+    || { echo "❌  CODESIGN_IDENTITY requis pour notariser"; exit 1; }
+  [[ -n "${APPLE_ID:-}" && -n "${APPLE_TEAM_ID:-}" && -n "${APPLE_APP_PASSWORD:-}" ]] \
+    || { echo "❌  APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD requis"; exit 1; }
+
+  echo "📬  Notarisation du DMG..."
+  xcrun notarytool submit "$DMG" \
+    --apple-id  "$APPLE_ID" \
+    --team-id   "$APPLE_TEAM_ID" \
+    --password  "$APPLE_APP_PASSWORD" \
+    --wait
+  xcrun stapler staple "$DMG"
 fi
 
 echo ""
