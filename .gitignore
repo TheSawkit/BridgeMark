@@ -1,0 +1,13 @@
+# Swift
+.build/
+DerivedData/
+.swiftpm/
+xcuserdata/
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Claude
+.claude
+CLAUDE.md
